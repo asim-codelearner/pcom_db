@@ -18,5 +18,11 @@ from django.conf.urls import url, include
 from . import views
 
 urlpatterns = [
-	url(r'^$', views.index, name = 'index')
+	url(r'^$', views.db_login, name = 'db_login'),
+	url(r'^landing/$', views.landing, name = 'landing'),
+	url(r'^details/$', views.details, name = 'details'),
+	url(r'^profile/$', views.profile, name = 'profile'),
+	url(r'^stat/$', views.stat, name = 'stat'),
+	url(r'^search_results/$', views.landing, name = 'search_results'),
+	url(r'^edit/$', views.edit, name = 'edit'),
 ]
