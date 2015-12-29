@@ -1,8 +1,29 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, render_to_response
+from django.contrib.auth import authenticate, login
+from django.template import RequestContext
 
 def db_login(request):
-	return render(request, 'database_app/login.html')
+	context = RequestContext(request)
+	
+	if request.method == 'POST':
+		username = request.POST['username']
+		password = request.POST['password']
+		
+		user = authenticate(username = username, password = password)
+		
+		if user:
+			if user.is_active:
+				login(request, user)
+				return HttpResponseRedirect('/landing/')
+			else:
+				return HttpResponse("Account Disabled")
+		else:
+			print ("Invalid Login Deatils")
+			return HttpResponse("Invalid Login details supplied")
+	else:
+		return render_to_response('/', {}, context)
+	
 	
 def landing(request):
 	return HttpResponse("LANDING: Building In Progress")
