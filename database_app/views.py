@@ -3,36 +3,28 @@ from django.shortcuts import render, render_to_response
 from django.contrib.auth import authenticate, login
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+#from .forms import Login_Form
+from django.contrib.auth.forms import AuthenticationForm
 
 def db_login(request):
 	
 	if request.method == 'POST':
-		username = request.POST['username']
-		password = request.POST['password']
+		form = AuthenticationForm(data = request.POST)
 		
-		user = authenticate(username = username, password = password)
-		
-		if user:
-			if user.is_active:
-				login(request, user)
-				return HttpResponseRedirect(reverse('database_app:landing'))
-			else:
-				error_message = 'Please enter correct username and/or password to login'
-				context = {
-							'error_message':error_message,
-				}
-				return render(request, 'database_app/login.html', context)
+		if form.is_valid():
+			login(request, user)
+			return HttpResponseRedirect(reverse('database_app:landing'))
 		else:
-			print ("Invalid Login Deatils")
-			error_message = 'Please enter correct username and/or password to login'
-			context = {
-						'error_message':error_message,
-			}
-			return render(request, 'database_app/login.html', context)
+			print(form.non_field_errors())
+
 	else:
-		return render(request, 'database_app/login.html')
-	
-	
+		form = AuthenticationForm()
+		
+	context = {
+				'login_form':form,
+			}
+	return render(request, 'database_app/login.html', context)
+		
 def landing(request):
 	return HttpResponse("LANDING: Building In Progress")
 	
