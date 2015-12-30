@@ -2,9 +2,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.contrib.auth import authenticate, login
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
 
 def db_login(request):
-	context = RequestContext(request)
 	
 	if request.method == 'POST':
 		username = request.POST['username']
@@ -15,14 +15,22 @@ def db_login(request):
 		if user:
 			if user.is_active:
 				login(request, user)
-				return HttpResponseRedirect('/landing/')
+				return HttpResponseRedirect(reverse('database_app:landing'))
 			else:
-				return HttpResponse("Account Disabled")
+				error_message = 'Please enter correct username and/or password to login'
+				context = {
+							'error_message':error_message,
+				}
+				return render(request, 'database_app/login.html', context)
 		else:
 			print ("Invalid Login Deatils")
-			return HttpResponse("Invalid Login details supplied")
+			error_message = 'Please enter correct username and/or password to login'
+			context = {
+						'error_message':error_message,
+			}
+			return render(request, 'database_app/login.html', context)
 	else:
-		return render_to_response('/', {}, context)
+		return render(request, 'database_app/login.html')
 	
 	
 def landing(request):
