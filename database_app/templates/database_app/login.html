@@ -1,6 +1,12 @@
 {% extends 'database_app/base.html' %}
 
 {% block content %}
+	{% if custom_message %}
+		<p>
+			{{ custom_message }}
+		</p>
+	{% endif %}
+	
 	{% if login_form.non_field_errors %}
 		{% for error in login_form.non_field_errors %}
 			<p>

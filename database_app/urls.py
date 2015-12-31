@@ -25,4 +25,6 @@ urlpatterns = [
 	url(r'^stat/$', views.stat, name = 'stat'),
 	url(r'^search_results/$', views.landing, name = 'search_results'),
 	url(r'^edit/$', views.edit, name = 'edit'),
+	url(r'^logout/$', views.db_logout, name = 'db_logout'),
+	url(r'^logout/(?P<status>\w+)/$', views.db_login, name = 'db_logout_success'),
 ]
