@@ -12,11 +12,10 @@ def db_login(request):
 		form = AuthenticationForm(data = request.POST)
 		
 		if form.is_valid():
-			login(request, user)
+		
+			login(request, form.get_user())
 			return HttpResponseRedirect(reverse('database_app:landing'))
-		else:
-			print(form.non_field_errors())
-
+	
 	else:
 		form = AuthenticationForm()
 		

@@ -1,20 +1,19 @@
 from django.db import models
-from django.contrib.auth.models import User
-	
-class Member_User(models.Model):
-	member_user = models.OneToOneField(User)
-	
-	def __str__(self):
-		return self.member_user.username
-		
+from django.conf import settings
+			
 class Executive_User(models.Model):
-	user = models.OneToOneField(Member_User)
+	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	
 	def __str__(self):
-		return self.user.member_user.username + '@ executive'
+		return self.user.username + '@ executive'
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Executive_User"),
+		)
 		
 class Senior_User(models.Model):
-	user = models.OneToOneField(Member_User)
+	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	executive_mentor = models.ForeignKey(
 									Executive_User,
 									on_delete = models.SET_NULL, #TODO: Change it to force setting Executive_User
@@ -22,12 +21,17 @@ class Senior_User(models.Model):
 								)
 								
 	def __str__(self):
-		senior_user_identifier = self.user.member_user.username + '@ senior'
+		senior_user_identifier = self.user.username + '@ senior'
 		return senior_user_identifier
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Senior_User"),
+		)
 								
 
 class Junior_User(models.Model):
-	user = models.OneToOneField(Member_User)
+	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	senior_mentor = models.ForeignKey(
 									Senior_User,
 									on_delete = models.SET_NULL, #TODO: Change it to force setting Senior_user
@@ -35,8 +39,13 @@ class Junior_User(models.Model):
 								)
 								
 	def __str__(self):
-		junior_user_identifier = self.user.member_user.username + '@ junior'
+		junior_user_identifier = self.user.username + '@ junior'
 		return junior_user_identifier
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Junior_User"),
+		)
 
 class Industry(models.Model):
 	industry_name = models.CharField(max_length = 20)
@@ -48,13 +57,18 @@ class Industry(models.Model):
 								
 	def __str__(self):
 		return self.industry_name
+	
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Industry"),
+		)
 		
 class Company(models.Model):
 	company_name = models.CharField(max_length = 25)
 	priority = models.CharField(max_length = 1)
 	status = models.CharField(max_length = 10)
 	owner = models.ForeignKey(
-									Member_User,
+									settings.AUTH_USER_MODEL,
 									on_delete = models.SET_NULL, #TODO: Change it to force setting Executive_User
 									null = True
 								)
@@ -66,6 +80,11 @@ class Company(models.Model):
 								
 	def __str__(self):
 		return self.company_name
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Company"),
+		)
 
 class Brand(models.Model):
 	brand_name = models.CharField(max_length = 25)
@@ -76,6 +95,11 @@ class Brand(models.Model):
 							
 	def __str__(self):
 		return self.brand_name
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Brand"),
+		)
 							
 class Company_Details(models.Model):
 	company = models.ForeignKey(
@@ -95,6 +119,11 @@ class Company_Details(models.Model):
 	def __str__(self):
 		details_identifier = self.salutation + ' ' + self.first_name +' @ ' + self.company.company_name
 		return details_identifier
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Company_Details"),
+		)
 	
 class Logs(models.Model):
 	contact = models.ForeignKey(
@@ -103,7 +132,13 @@ class Logs(models.Model):
 							)
 	timestamp = models.DateTimeField(auto_now = True)
 	logs = models.TextField()
+	#editor = contact.company.owner.username
 	
 	def __str__(self):
 		logs_identifier = 'logs@ ' + self.contact.company.company_name + ' ; ' + self.contact.first_name
 		return logs_identifier
+		
+	class Meta:
+		permissions = (
+						("view", "Can see contents of Logs"),
+		)

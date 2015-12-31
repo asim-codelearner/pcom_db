@@ -1,7 +1,8 @@
-from django.contrib import admin
-from .models import Executive_User, Member_User, Senior_User, Junior_User, Company, Industry, Brand, Company_Details, Logs
+from django.contrib import admin, auth
+from .models import Executive_User, Senior_User, Junior_User, Company, Industry, Brand, Company_Details, Logs
+from django.conf import settings
+#from django.contrib.auth.models import User
 
-admin.site.register(Member_User)
 admin.site.register(Executive_User)
 admin.site.register(Senior_User)
 admin.site.register(Junior_User)
