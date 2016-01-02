@@ -77,6 +77,7 @@ class Company(models.Model):
 									on_delete = models.SET_NULL, #TODO: Change it to force setting Industry
 									null = True
 								)
+	date_time = models.DateTimeField(auto_now_add = True)
 								
 	def __str__(self):
 		return self.company_name
@@ -92,6 +93,7 @@ class Brand(models.Model):
 									Company,
 									on_delete = models.CASCADE
 							)
+	date_time = models.DateTimeField(auto_now_add = True)
 							
 	def __str__(self):
 		return self.brand_name
@@ -110,11 +112,13 @@ class Company_Details(models.Model):
 	salutation = models.CharField(max_length = 3)
 	first_name = models.CharField(max_length = 20)
 	last_name = models.CharField(max_length = 20)
+	designation = models.CharField(max_length = 25)
 	e_mail = models.EmailField()
 	board_number = models.CharField(max_length = 12)#TODO: Change it appropriately
 	mobile_number = models.CharField(max_length = 12)
 	address = models.TextField()
 	is_correct_contact = models.BooleanField()
+	date_time = models.DateTimeField(auto_now_add = True)
 	
 	def __str__(self):
 		details_identifier = self.salutation + ' ' + self.first_name +' @ ' + self.company.company_name

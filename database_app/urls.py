@@ -15,10 +15,10 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import url, include
+from .views import Db_Login_View
 from . import views
-
 urlpatterns = [
-	url(r'^$', views.db_login, name = 'db_login'),
+	url(r'^$', Db_Login_View.as_view(), name = 'db_login'),
 	url(r'^landing/$', views.landing, name = 'landing'),
 	url(r'^details/$', views.details, name = 'details'),
 	url(r'^profile/$', views.profile, name = 'profile'),
@@ -26,5 +26,5 @@ urlpatterns = [
 	url(r'^search_results/$', views.landing, name = 'search_results'),
 	url(r'^edit/$', views.edit, name = 'edit'),
 	url(r'^logout/$', views.db_logout, name = 'db_logout'),
-	url(r'^logout/(?P<status>\w+)/$', views.db_login, name = 'db_logout_success'),
+	url(r'^logout/(?P<status>\w+)/$', Db_Login_View.as_view(), name = 'db_logout_success'),
 ]

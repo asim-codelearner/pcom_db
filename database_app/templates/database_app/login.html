@@ -7,8 +7,8 @@
 		</p>
 	{% endif %}
 	
-	{% if login_form.non_field_errors %}
-		{% for error in login_form.non_field_errors %}
+	{% if form.non_field_errors %}
+		{% for error in form.non_field_errors %}
 			<p>
 				{{ error }}
 			</p>
@@ -18,12 +18,12 @@
 	<form method="post" action="{% url 'database_app:db_login' %}">
 		{% csrf_token %}
 		<div>
-			{{ login_form.username.errors }}
-			{{ login_form.username.label_tag }} {{ login_form.username }}
+			{{ form.username.errors }}
+			{{ form.username.label_tag }} {{ form.username }}
 		</div>
 		<div>
-			{{ login_form.password.errors }}
-			{{ login_form.password.label_tag }} {{ login_form.password }}
+			{{ form.password.errors }}
+			{{ form.password.label_tag }} {{ form.password }}
 		</div>
 		<div>
 		<label>&nbsp;</label><input type="submit" value='Log in'/>
