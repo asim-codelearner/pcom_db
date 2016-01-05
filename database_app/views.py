@@ -12,6 +12,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import QueryDict
 from django.contrib.auth.views import password_change
+from . import models
+from .utilities import Utilities
+from django.core.exceptions import ObjectDoesNotExist
 #from django.contrib.auth import User
 
 def build_url_with_get(*args, **kwargs):
@@ -59,6 +62,7 @@ class Db_Login_View(FormView):
 		else:
 			return reverse_lazy('database_app:landing')
 
+			
 class Db_Logout_View(LoginRequiredMixin, RedirectView):
 	login_url = reverse_lazy('database_app:db_login')
 	
@@ -70,14 +74,12 @@ class Db_Logout_View(LoginRequiredMixin, RedirectView):
 		url = build_url_with_get('database_app:db_login', params = {'logout':'success'})
 		return url
 
+		
 class Password_Change_View(LoginRequiredMixin, FormView):
 	login_url = reverse_lazy('database_app:db_login')
 	
 	template_name = 'database_app/password_change_form.html'
 	form_class = PasswordChangeForm
-	#a_url = reverse_lazy('database_app:landing')
-	#url = build_url_with_get('database_app:landing', params = {'password_change':'success'})
-	#print(a_url)
 	
 	def get_form_kwargs(self):
 		kwargs = super(Password_Change_View, self).get_form_kwargs()
@@ -102,26 +104,47 @@ class Password_Change_View(LoginRequiredMixin, FormView):
 	
 	
 #@method_decorator(login_required, name = 'dispatch')
-# class Db_Landing_View(LoginRequiredMixin, ListView):
-	# login_url = reverse_lazy('database_app:db_login')
+class Db_Landing_View(LoginRequiredMixin, ListView):
+	login_url = reverse_lazy('database_app:db_login')
 	
-	# def get_menu_items(self, user):
-		# menu_item = {
-						# 'user': user.get_full_name(),
-						# 'logout_url': reverse_lazy('database_app:db_logout'),
-						# 'change_password_url': reverse_lazy('database_app:change_password'),
-		# }
+	template_name = 'database_app/landing.html'
+	
+	def get_queryset(self):
+		companies = models.Company.objects.filter(owner_id = self.request.user.id)
 		
+		return companies
+		
+	def get_menu_items(self):	
+		menu_items = [
+						{'link_url':reverse_lazy('database_app:password_change'), 'display_label':'Change password'},
+						{'link_url':reverse_lazy('database_app:db_logout'), 'display_label':'Log out'},
+		]
+		
+		return menu_items
 			
-@login_required()
-def landing(request):
-	context = {}
-	
-	if 'password_change' in request.GET:
-		if request.GET['password_change'].lower() == 'success':
+	def get_context_data(self, **kwargs):
+		context= super(Db_Landing_View, self).get_context_data(**kwargs)
+		context['users_name'] = self.request.user.get_full_name()
+		context['menu_items'] = self.get_menu_items()
+		#context['companies'] = models.Company.objects.filter(owner_id = self.request.user.id)
+		#context['company_details'] = 
+		
+		if 'password_change' in self.request.GET:
+			if self.request.GET['password_change'].lower() == 'success':
 				custom_message = 'Password changed successfully.'
 				context['custom_message'] = custom_message
-	return render(request, 'database_app/landing.html', context)
+				
+		return context
+			
+# @login_required()
+# def landing(request):
+	# context = {}
+	
+	# if 'password_change' in request.GET:
+		# if request.GET['password_change'].lower() == 'success':
+				# custom_message = 'Password changed successfully.'
+				# context['custom_message'] = custom_message
+	# return render(request, 'database_app/landing.html', context)
 
 @login_required()
 def details(request):

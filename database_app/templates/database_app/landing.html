@@ -1,13 +1,55 @@
 {% extends 'database_app/base.html' %}
 
 {% block content %}
-<p><a href="{% url 'database_app:db_logout' %}">Logout</a></p>
-<p><a href="{% url 'database_app:password_change' %}">Change Password</a></p>
-
+	<div>
+		<p>Welcome, {{users_name}}</p>
+		{% for value in menu_items %}
+			<p><a href={{value.link_url}}>{{value.display_label}}</a></p>
+		{% endfor%}
+	</div>	
 	{% if custom_message %}
 		<p>
 			{{ custom_message }}
 		</p>
 	{% endif %}
 
+	<div>
+		<h2>Companies</h2>
+		<table border="1" >
+			<thead>
+				<tr>
+					<th>Company Name</th>
+					<th>City</th>
+					<th>Contact Person</th>
+					<th>Designation</th>
+					<th>Contact Info</th>
+					<th>Status</th>
+					<th>Logs</th>
+				</tr>
+			</thead>
+			<tfoot>
+				{% for company in object_list %}
+				<tr>
+					<td>{{company.company_name}}</td>
+					{% for details in company.company_details_set.all %}
+						{% if details.is_correct_contact = True %}	
+						<td>{{details.city}}</td>
+						<td>{{details.salutation}}
+							{{details.first_name}}
+							{{details.last_name}}</td>
+						<td>{{details.designation}}</td>
+						<td><p>{{details.board_number}}</p>
+							<p>{{details.mobile_number}}</p>
+							<p>{{details.e_mail}}</p></td>
+						<td>{{company.status}}</td>
+						{% with logs=details.logs_set.all|dictsort:"timestamp"|first %}
+						<td>[{{logs.timestamp}}] {{logs.logs}}</td>
+						{% endwith %}
+						{% endif %}
+					{% endfor %}
+				</tr>
+			{% endfor %}
+			</tfoot>
+		</table>
+	</div>
 {% endblock %}
