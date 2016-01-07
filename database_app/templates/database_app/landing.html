@@ -38,12 +38,21 @@
 							{{details.first_name}}
 							{{details.last_name}}</td>
 						<td>{{details.designation}}</td>
-						<td><p>{{details.board_number}}</p>
-							<p>{{details.mobile_number}}</p>
-							<p>{{details.e_mail}}</p></td>
+						<td><p>Board Line: {{details.board_number}}</p>
+							<p>Mobile: {{details.mobile_number}}</p>
+							<p>E-mail: {{details.e_mail}}</p></td>
 						<td>{{company.status}}</td>
-						{% with logs=details.logs_set.all|dictsort:"timestamp"|first %}
-						<td>[{{logs.timestamp}}] {{logs.logs}}</td>
+						{% with logs=details.logs_set.all|dictsort:"timestamp"|last %}
+						<td>
+							<form action="" method="post">
+							{% csrf_token %}
+							{{logs_form.as_p}}
+							<input type="hidden" name="company_details_id" value={{details.id}}>
+							<input type="submit" value="Submit log" />
+							</form>
+							{% if logs %}
+							[{{logs.timestamp}}] {{logs.logs}}
+							{% endif %}</td>
 						{% endwith %}
 						{% endif %}
 					{% endfor %}
@@ -52,4 +61,14 @@
 			</tfoot>
 		</table>
 	</div>
+	
+	{% if is_paginated %}
+		{% if page_obj.has_previous %}
+			<a href="/landing?page={{ page_obj.previous_page_number }}">previous</a>
+		{% endif %}
+		Page {{page_obj.number}} of {{page_obj.paginator.num_pages}}
+		{% if page_obj.has_next %}
+			<a href="/landing?page={{ page_obj.next_page_number }}">next</a>
+		{% endif %}
+	{% endif %}
 {% endblock %}

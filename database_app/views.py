@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.views.generic.base import RedirectView, View
 from django.views.generic.list import ListView
 from django.utils.decorators import method_decorator
@@ -15,6 +15,7 @@ from django.contrib.auth.views import password_change
 from . import models
 from .utilities import Utilities
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms import models as model_forms
 #from django.contrib.auth import User
 
 def build_url_with_get(*args, **kwargs):
@@ -108,11 +109,63 @@ class Db_Landing_View(LoginRequiredMixin, ListView):
 	login_url = reverse_lazy('database_app:db_login')
 	
 	template_name = 'database_app/landing.html'
+	paginate_by = 10
+	ordering = 'company_name'
+	
+	logs_model = models.Logs
+	logs_field = ['logs']
 	
 	def get_queryset(self):
-		companies = models.Company.objects.filter(owner_id = self.request.user.id)
+		self.queryset = models.Company.objects.filter(owner_id = self.request.user.id)
+		queryset = super(Db_Landing_View, self).get_queryset()
+		return queryset
 		
-		return companies
+	def get_form_class(self):
+		return model_forms.modelform_factory(self.logs_model, fields=self.logs_field)
+		
+	def get_form(self):
+		form_class = self.get_form_class()
+		return form_class(**self.get_form_kwargs())
+	
+	def get_form_kwargs(self):
+		kwargs = {}
+		
+		if self.request.method in ('POST'):
+			kwargs.update({
+				'data': self.request.POST,
+			})
+		return kwargs
+	
+	def form_valid(self, form):
+		logs_text = form.cleaned_data['logs']
+		contact_id = self.request.POST.get('company_details_id')
+		contact = models.Company_Details.objects.get(pk=contact_id)
+		
+		logs = models.Logs(contact = contact, logs = logs_text)
+		logs.save()
+		
+		return HttpResponseRedirect(self.get_success_url())#TODO: Success URL
+	
+	def get_success_url(self):
+		return self.request.get_full_path()
+		
+	def form_invalid(self, form):
+		"""
+		If the form is invalid, re-render the context data with the
+		data-filled form and errors.
+		"""
+		return self.render_to_response(self.get_context_data())
+		
+	def post(self, request, *args, **kwargs):#TODO: Change it according to this view
+		"""
+		Handles POST requests, instantiating a form instance with the passed
+		POST variables and then checked for validity.
+		"""
+		form = self.get_form()
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
 		
 	def get_menu_items(self):	
 		menu_items = [
@@ -126,8 +179,7 @@ class Db_Landing_View(LoginRequiredMixin, ListView):
 		context= super(Db_Landing_View, self).get_context_data(**kwargs)
 		context['users_name'] = self.request.user.get_full_name()
 		context['menu_items'] = self.get_menu_items()
-		#context['companies'] = models.Company.objects.filter(owner_id = self.request.user.id)
-		#context['company_details'] = 
+		context['logs_form'] = self.get_form()
 		
 		if 'password_change' in self.request.GET:
 			if self.request.GET['password_change'].lower() == 'success':
