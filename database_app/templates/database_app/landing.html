@@ -1,11 +1,8 @@
 {% extends 'database_app/base.html' %}
-
+{% load forms_css %}
 {% block content %}
 	<div>
 		<p>Welcome, {{users_name}}</p>
-		{% for value in menu_items %}
-			<p><a href={{value.link_url}}>{{value.display_label}}</a></p>
-		{% endfor%}
 	</div>	
 	{% if custom_message %}
 		<p>
@@ -14,8 +11,8 @@
 	{% endif %}
 
 	<div>
-		<h2>Companies</h2>
-		<table border="1" >
+		<table class="table table-bordered table-striped table-condensed">
+			<caption>Company List</caption>
 			<thead>
 				<tr>
 					<th>Company Name</th>
@@ -27,7 +24,7 @@
 					<th>Logs</th>
 				</tr>
 			</thead>
-			<tfoot>
+			<tbody>
 				{% for company in object_list %}
 				<tr>
 					<td>{{company.company_name}}</td>
@@ -38,27 +35,36 @@
 							{{details.first_name}}
 							{{details.last_name}}</td>
 						<td>{{details.designation}}</td>
-						<td><p>Board Line: {{details.board_number}}</p>
-							<p>Mobile: {{details.mobile_number}}</p>
-							<p>E-mail: {{details.e_mail}}</p></td>
+						<td><p><span class="glyphicon glyphicon-phone-alt"></span> :&nbsp;&nbsp;&nbsp;&nbsp;{{details.board_number}}</p>
+							<p><span class="glyphicon glyphicon-phone"></span> :&nbsp;&nbsp;&nbsp;&nbsp;{{details.mobile_number}}</p>
+							<p><span class="glyphicon glyphicon-envelope"></span> :&nbsp;&nbsp;&nbsp;&nbsp;{{details.e_mail}}</p></td>
 						<td>{{company.status}}</td>
 						{% with logs=details.logs_set.all|dictsort:"timestamp"|last %}
 						<td>
-							<form action="" method="post">
-							{% csrf_token %}
-							{{logs_form.as_p}}
-							<input type="hidden" name="company_details_id" value={{details.id}}>
-							<input type="submit" value="Submit log" />
+							<form action="" method="post" class="form-horizontal">
+								{% csrf_token %}
+								<div class="form-group">
+									<div class="col-lg-12">
+										{{logs_form.logs|add_css_to_form:"class:form-control"}}
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-12">
+										<input type="hidden" name="company_details_id" value={{details.id}}>
+										<button type="submit" class="btn btn-primary">Submit log</button>
+									</div>
+								</div>
 							</form>
+							<br>
 							{% if logs %}
-							[{{logs.timestamp}}] {{logs.logs}}
+								<p><span class="glyphicon glyphicon-comment"></span> &nbsp;&nbsp;&nbsp;&nbsp;[{{logs.timestamp}}] {{logs.logs}}<p>
 							{% endif %}</td>
 						{% endwith %}
 						{% endif %}
 					{% endfor %}
 				</tr>
 			{% endfor %}
-			</tfoot>
+			</tbody>
 		</table>
 	</div>
 	

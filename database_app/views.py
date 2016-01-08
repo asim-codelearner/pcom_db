@@ -13,7 +13,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import QueryDict
 from django.contrib.auth.views import password_change
 from . import models
-from .utilities import Utilities
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import models as model_forms
 #from django.contrib.auth import User

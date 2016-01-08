@@ -1,33 +1,58 @@
 {% extends 'database_app/base.html' %}
-
+{% load forms_css %}
 {% block content %}
+	
 	{% if custom_message %}
-		<p>
-			{{ custom_message }}
-		</p>
+		<div class="alert alert-info">
+			<p>{{ custom_message }}</p>
+		</div>
 	{% endif %}
 	
-	{% if form.non_field_errors %}
-		{% for error in form.non_field_errors %}
-			<p>
-				{{ error }}
-			</p>
-		{% endfor %}
-	{% endif %}
 	
-	<form method="post" action="{% url 'database_app:db_login' %}">
+	<form method="post" action="" class="form-horizontal">
 		{% csrf_token %}
-		<div>
-			{{ form.username.errors }}
-			{{ form.username.label_tag }} {{ form.username }}
-		</div>
-		<div>
-			{{ form.password.errors }}
-			{{ form.password.label_tag }} {{ form.password }}
-		</div>
-		<div>
-		<input type="hidden" name="next" value="{{ next }}" />
-		<input type="submit" value='Log in'/>
+		
+		{% if form.non_field_errors %}
+			<div class="alert alert-danger">
+				<ul>
+					{% for error in form.non_field_errors %}
+						<li>{{ error }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+		{% endif %}
+		{% for field in form %}
+			{% if field.errors %}
+				<div class="form-group has-error">
+					<label class="col-sm-2 control-label" for="{{field.id_for_label}}">{{field.label}}</label>
+					<div class="col-sm-3">
+						{{field|add_css_to_form:"class:form-control"}}
+							<span class="help-block">
+								{% for error in field.errors %}
+									{{error}}
+								{% endfor %}
+							</span>
+					</div>
+				</div>
+			{% else %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{field.id_for_label}}">{{field.label}}</label>
+					<div class="col-sm-3">
+						{{field|add_css_to_form:"class:form-control"}}
+							<span class="help-block">
+								{% if field.help_text %}
+									<p class="help-block"><small>{{ field.help_text }}</small></p>
+								{% endif %}
+							</span>
+					</div>
+				</div>
+			{% endif %}
+		{% endfor %}
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-10">
+				<input type="hidden" name="next" value="{{ next }}" />
+				<button type="submit" class="btn btn-primary">Log in</button>
+			</div>
 		</div>
 	</form>
 {% endblock %}
