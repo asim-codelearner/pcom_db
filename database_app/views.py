@@ -5,9 +5,10 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import FormView, CreateView
+from django.views.generic.edit import FormView
 from django.views.generic.base import RedirectView, View
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import QueryDict
@@ -204,6 +205,10 @@ class Db_Landing_View(LoginRequiredMixin, ListView):
 				# context['custom_message'] = custom_message
 	# return render(request, 'database_app/landing.html', context)
 
+# class Db_Details_View(LoginRequiredMixin, DetailView):
+	# login_url = reverse_lazy('database_app:db_login')
+	
+	
 @login_required()
 def details(request):
 	return HttpResponse("DETAILS: Building In Progress")
