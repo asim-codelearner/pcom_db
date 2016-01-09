@@ -98,6 +98,13 @@ class Password_Change_View(LoginRequiredMixin, FormView):
 		update_session_auth_hash(self.request, form.user)
 		return super(Password_Change_View, self).form_valid(form)
 		
+	def get_context_data(self, **kwargs):
+		context = super(Password_Change_View, self).get_context_data(**kwargs)
+		
+		context['menu_items'] = [{'link_url':reverse_lazy('database_app:db_logout'), 'display_label':'Log out'}]
+		print(context)
+		return context
+		
 	def get_success_url(self):
 		next_url = build_url_with_get('database_app:landing', params = {'password_change':'success'})
 		return next_url
