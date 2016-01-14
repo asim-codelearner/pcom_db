@@ -18,6 +18,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import models as model_forms
 #from django.contrib.auth import User
 
+from django.http import Http404
+
 def build_url_with_get(*args, **kwargs):
 	params = kwargs.pop('params', {})
 	url = reverse_lazy(*args, **kwargs)
@@ -145,6 +147,7 @@ class Db_Landing_View(LoginRequiredMixin, ListView):
 	
 	def form_valid(self, form):
 		logs_text = form.cleaned_data['logs']
+		author = self.request.user.username
 		contact_id = self.request.POST.get('company_details_id')
 		contact = models.Company_Details.objects.get(pk=contact_id)
 		
@@ -205,13 +208,28 @@ class Db_Landing_View(LoginRequiredMixin, ListView):
 				# context['custom_message'] = custom_message
 	# return render(request, 'database_app/landing.html', context)
 
-# class Db_Details_View(LoginRequiredMixin, DetailView):
-	# login_url = reverse_lazy('database_app:db_login')
+class Db_Details_View(LoginRequiredMixin, DetailView):
+	login_url = reverse_lazy('database_app:db_login')
 	
+	model = models.Company
+	template_name = 'database_app/company_details.html'
 	
-@login_required()
-def details(request):
-	return HttpResponse("DETAILS: Building In Progress")
+	def get_menu_items(self):	
+		menu_items = [
+						{'link_url':reverse_lazy('database_app:password_change'), 'display_label':'Change password'},
+						{'link_url':reverse_lazy('database_app:db_logout'), 'display_label':'Log out'},
+		]
+		
+		return menu_items
+		
+	def get_context_data(self, **kwargs):
+		context= super(Db_Details_View, self).get_context_data(**kwargs)
+		context['menu_items'] = self.get_menu_items()
+		
+		return context
+# @login_required()
+# def details(request):
+	# return HttpResponse("DETAILS: Building In Progress")
 
 @login_required()
 def profile(request):

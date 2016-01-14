@@ -64,12 +64,12 @@ class Industry(models.Model):
 		)
 		
 class Company(models.Model):
-	company_name = models.CharField(max_length = 25)
+	company_name = models.CharField(max_length = 30)
 	priority = models.CharField(max_length = 1)
-	status = models.CharField(max_length = 10)
+	status = models.CharField(max_length = 15)
 	owner = models.ForeignKey(
 									settings.AUTH_USER_MODEL,
-									on_delete = models.SET_NULL, #TODO: Change it to force setting Executive_User
+									on_delete = models.SET_NULL, #TODO: Change it to force setting User
 									null = True
 								)
 	industry =  models.ForeignKey(
@@ -88,7 +88,7 @@ class Company(models.Model):
 		)
 
 class Brand(models.Model):
-	brand_name = models.CharField(max_length = 25)
+	brand_name = models.CharField(max_length = 30)
 	company = models.ForeignKey(
 									Company,
 									on_delete = models.CASCADE
@@ -108,14 +108,15 @@ class Company_Details(models.Model):
 									Company,
 									on_delete = models.CASCADE
 							)
-	city = models.CharField(max_length = 25)
+	city = models.CharField(max_length = 30)
 	salutation = models.CharField(max_length = 3)
-	first_name = models.CharField(max_length = 20)
-	last_name = models.CharField(max_length = 20)
-	designation = models.CharField(max_length = 25)
+	first_name = models.CharField(max_length = 30)
+	last_name = models.CharField(max_length = 30)
+	designation = models.CharField(max_length = 40)
 	e_mail = models.EmailField()
-	board_number = models.CharField(max_length = 12)#TODO: Change it appropriately
-	mobile_number = models.CharField(max_length = 12)
+	board_number_1 = models.CharField(max_length = 15)#TODO: Change it appropriately
+	board_number_2 = models.CharField(max_length = 15)#TODO: Change it appropriately
+	mobile_number = models.CharField(max_length = 15)
 	address = models.TextField()
 	is_correct_contact = models.BooleanField()
 	date_time = models.DateTimeField(auto_now_add = True)
@@ -136,7 +137,7 @@ class Logs(models.Model):
 							)
 	timestamp = models.DateTimeField(auto_now = True)
 	logs = models.TextField()
-	#editor = contact.company.owner.username
+	author = models.CharField(max_length = 30)
 	
 	def __str__(self):
 		logs_identifier = 'logs@ ' + self.contact.company.company_name + ' ; ' + self.contact.first_name
